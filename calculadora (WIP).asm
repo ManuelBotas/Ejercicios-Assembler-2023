@@ -24,7 +24,7 @@ org 100h
 .code
     mov ax,@data
     mov ds,ax
-    
+looop:
     mov dx,offset msgInput
     call printstr
 
@@ -44,6 +44,8 @@ org 100h
     call menu
     call readnum
     mov opcion,al
+    
+    call cls
 
     cmp opcion,1
     je suma
@@ -61,10 +63,16 @@ suma:
     mov al,num1
     add al,num2
     mov resultado,al
+    call newline
     mov dx,offset msgSuma
     call printstr
-    ;cmp resultado,9
-    ;WIP
+    mov ax,resultado
+    cmp resultado,9
+    jle smallresult
+    call printbignum
+    mov ah,1
+    int 21h
+    jmp looop
 
 resta:
     mov al,num1
@@ -93,6 +101,15 @@ division:
     call printstr
     ;WIP
 
+diverror:
+    ;WIP
+
+smallresult:
+    mov dl,resultado
+    call printnum
+    mov ah,1
+    int 21h
+    jmp looop
 
     proc cls
         mov ah,6
@@ -101,6 +118,7 @@ division:
         mov cx,0
         mov dx,184fh
         int 10h
+        call newline
         ret
     endp
 
