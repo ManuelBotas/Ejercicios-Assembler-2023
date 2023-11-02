@@ -20,11 +20,18 @@ org 100h
     msgProducto db "El producto de los numeros ingresados es: ",24h
     msgDivision db "La division de los numeros ingresados es: ",24h
     msgDivError db "No se puede dividir por cero",24h
+    msgPause db "Presione una tecla para continuar...",24h
     CRLF db 0dh,0ah,24h
 .code
     mov ax,@data
     mov ds,ax
 looop:
+    call newline
+
+    call pause
+
+    call cls
+
     mov dx,offset msgInput
     call printstr
 
@@ -70,8 +77,6 @@ suma:
     cmp resultado,9
     jle smallresult
     call printbignum
-    mov ah,1
-    int 21h
     jmp looop
 
 resta:
@@ -107,16 +112,22 @@ diverror:
 smallresult:
     mov dl,resultado
     call printnum
-    mov ah,1
-    int 21h
     jmp looop
+
+    proc pause
+        mov dx,offset msgPause
+        call printstr
+        mov ah,1
+        int 21h
+        ret
+    endp
 
     proc cls
         mov ah,6
         mov al,0
         mov bh,7
         mov cx,0
-        mov dx,184fh
+        mov dx,1950h
         int 10h
         call newline
         ret
