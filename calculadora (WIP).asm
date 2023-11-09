@@ -83,9 +83,14 @@ resta:
     mov al,num1
     sub al,num2
     mov resultado,al
+    call newline
     mov dx,offset msgResta
     call printstr
-    ;WIP
+    cmp resultado,0
+    jl negnumber
+    mov dl,resultado
+    call printnum
+    jmp looop
 
 producto:
     mov al,num1
@@ -112,6 +117,15 @@ diverror:
 bigresult:
     mov ax,resultado
     call printbignum
+    jmp looop
+
+negnumber:
+    mov dl,45
+    call printchar
+    mov al,resultado
+    neg al
+    mov dl,al
+    call printnum
     jmp looop
 
     proc pause
@@ -187,6 +201,12 @@ bigresult:
         int 21h
         ret
     endp
+
+    proc printchar
+        mov ah,2
+        int 21h
+        ret
+    endp printchar
     
     proc readnum
         mov ah,1
@@ -197,7 +217,6 @@ bigresult:
     
     proc printnum
         add dl,30h
-        mov ah,2
-        int 21h
+        call printchar
         ret
     endp
