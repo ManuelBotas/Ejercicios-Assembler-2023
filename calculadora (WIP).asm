@@ -74,9 +74,10 @@ suma:
     mov dx,offset msgSuma
     call printstr
     mov ax,resultado
-    cmp resultado,9
-    jle smallresult
-    call printbignum
+    cmp resultado,10
+    jge bigresult
+    mov dl,resultado
+    call printnum
     jmp looop
 
 resta:
@@ -109,9 +110,8 @@ division:
 diverror:
     ;WIP
 
-smallresult:
-    mov dl,resultado
-    call printnum
+bigresult:
+    call printbignum
     jmp looop
 
     proc pause
