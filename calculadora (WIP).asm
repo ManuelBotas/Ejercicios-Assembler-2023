@@ -17,6 +17,7 @@ org 100h
     msgOpProd db "3. Multiplicar",24h
     msgOpDiv db "4. Dividir",24h
     msgOpPot db "5. Potencia",24h
+    msgOpFact db "6. Factorial",24h
     msgOpExit db "Elija otro numero para salir",24h
     msgOp db "Que desea hacer?",24h
     msgSuma db "La suma de los numeros ingresados es: ",24h
@@ -25,8 +26,9 @@ org 100h
     msgDivCociente db "El cociente de la division es: ",24h
     msgDivResto db "El resto de la division es: ",24h
     msgDivError db "No se puede dividir por cero",24h
-    msgPotencia1 db " elevado a la ",24h
-    msgPotencia2 db " es: ",24h
+    msgPotencia db " elevado a la ",24h
+    msgEs db " es: ",24h
+    msgFactorial db "El factorial de ",24h
     msgPause db "Presione una tecla para continuar...",24h
     CRLF db 0dh,0ah,24h
 .code
@@ -55,6 +57,8 @@ looop:
     je division
     cmp opcion,5
     je potencia
+    cmp opcion,6
+    je factorial
     jmp fin
 
 fin:ret
@@ -136,11 +140,30 @@ pot:mul num1
     mov resultado,al
     mov dl,num1
     call printnum
-    mov dx,offset msgPotencia1
+    mov dx,offset msgPotencia
     call printstr
     mov dl,num2
     call printnum
-    mov dx,offset msgPotencia2
+    mov dx,offset msgEs
+    call printstr
+    cmp resultado,10
+    jae result2
+    mov dl,resultado
+    call printnum
+    jmp looop
+
+factorial:
+    call input1
+    mov cl,num1
+    mov ax,1
+fac:mul cl
+    loop fac
+    mov resultado,al
+    mov dx,offset msgFactorial
+    call printstr
+    mov dl,num1
+    call printnum
+    mov dx,offset msgEs
     call printstr
     cmp resultado,10
     jae result2
@@ -215,6 +238,9 @@ negnumber:
         mov dx,offset msgOpPot
         call printstr
         call newline
+        mov dx,offset msgOpFact
+        call printstr
+        call newline
         mov dx,offset msgOpExit
         call printstr
         call newline
@@ -233,6 +259,7 @@ negnumber:
         mov num1,al
 
         call cls
+        ret
     endp
     
     proc input2
@@ -251,6 +278,7 @@ negnumber:
         mov num2,al
 
         call cls
+        ret
     endp
 
     proc split2digit
