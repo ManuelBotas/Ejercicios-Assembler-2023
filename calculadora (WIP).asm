@@ -98,7 +98,11 @@ producto:
     mov resultado,al
     mov dx,offset msgProducto
     call printstr
-    ;WIP
+    cmp resultado,10
+    jge bigresult
+    mov dl,resultado
+    call printnum
+    jmp looop
 
 division:
     mov al,num1
@@ -115,7 +119,8 @@ diverror:
     ;WIP
 
 bigresult:
-    mov ax,resultado
+    mov ax,0
+    mov al,resultado
     call printbignum
     jmp looop
 
