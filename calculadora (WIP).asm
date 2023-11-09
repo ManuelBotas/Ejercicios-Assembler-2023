@@ -1,6 +1,7 @@
 org 100h
 
 .data
+    tab1 db 5 dup(?)
     num1 db ?
     num2 db ?
     resultado db ?
@@ -9,6 +10,7 @@ org 100h
     unidades db ?
     decenas db ?
     centenas db ?
+    max db ?
     opcion db ?
     msgInput db "Ingrese un numero: ",24h
     msgMenu db "Calculadora: ",24h
@@ -18,6 +20,7 @@ org 100h
     msgOpDiv db "4. Dividir",24h
     msgOpPot db "5. Potencia",24h
     msgOpFact db "6. Factorial",24h
+    msgOpMayor db "7. Mayor",24h
     msgOpExit db "Elija otro numero para salir",24h
     msgOp db "Que desea hacer?",24h
     msgSuma db "La suma de los numeros ingresados es: ",24h
@@ -29,6 +32,7 @@ org 100h
     msgPotencia db " elevado a la ",24h
     msgEs db " es: ",24h
     msgFactorial db "El factorial de ",24h
+    msgMayor db "El mayor de los numeros ingresados es: ",24h
     msgPause db "Presione una tecla para continuar...",24h
     CRLF db 0dh,0ah,24h
 .code
@@ -59,9 +63,9 @@ looop:
     je potencia
     cmp opcion,6
     je factorial
+    cmp opcion,7
+    je mayor
     jmp fin
-
-fin:ret
 
 suma:
     call input2
@@ -171,6 +175,34 @@ fac:mul cl
     call printnum
     jmp looop
 
+mayor:
+    mov si,offset tab1
+    mov max,0
+    mov cx,5
+ing:call newline
+    mov dx,offset msgInput
+    call printstr
+    call readnum
+    mov [si],al
+    inc si
+    loop ing
+    mov si,offset tab1
+    mov cx,5
+may:mov bl,[si]
+    cmp bl,max
+    jle may2
+    mov max,bl
+may2:inc si
+    loop may
+    call newline
+    mov dx,offset msgMayor
+    call printstr
+    cmp max,10
+    jae result2
+    mov dl,max
+    call printnum
+    jmp looop
+
 result2:
     cmp resultado,100
     jae result3
@@ -239,6 +271,9 @@ negnumber:
         call printstr
         call newline
         mov dx,offset msgOpFact
+        call printstr
+        call newline
+        mov dx,offset msgOpMayor
         call printstr
         call newline
         mov dx,offset msgOpExit
@@ -347,3 +382,5 @@ negnumber:
         call printchar
         ret
     endp
+
+fin:ret
