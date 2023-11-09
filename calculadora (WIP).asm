@@ -143,14 +143,14 @@ pot:mul num1
     mov dx,offset msgPotencia2
     call printstr
     cmp resultado,10
-    jge result2
+    jae result2
     mov dl,resultado
     call printnum
     jmp looop
 
 result2:
     cmp resultado,100
-    jge result3
+    jae result3
     mov ax,0
     mov al,resultado
     call print2digit
@@ -256,19 +256,22 @@ negnumber:
     proc split2digit
         mov bl,10
         div bl
-        mov unidades,ah
         mov decenas,al
+        mov unidades,ah
         ret
     endp
 
     proc split3digit
         mov bl,100
         div bl
-        mov centenas,ah
+        mov centenas,al
+        mov ch,ah
+        mov ax,0
+        mov ax,ch
         mov bl,10
         div bl
-        mov decenas,ah
-        mov unidades,al
+        mov decenas,al
+        mov unidades,ah
         ret
     endp
     
