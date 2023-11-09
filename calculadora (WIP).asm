@@ -6,6 +6,9 @@ org 100h
     resultado db ?
     resto db ?
     cociente db ?
+    unidades db ?
+    decenas db ?
+    centenas db ?
     opcion db ?
     msgInput db "Ingrese un numero: ",24h
     msgMenu db "Calculadora: ",24h
@@ -13,6 +16,7 @@ org 100h
     msgOpRes db "2. Restar",24h
     msgOpProd db "3. Multiplicar",24h
     msgOpDiv db "4. Dividir",24h
+    msgOpPot db "5. Potencia",24h
     msgOpExit db "Elija otro numero para salir",24h
     msgOp db "Que desea hacer?",24h
     msgSuma db "La suma de los numeros ingresados es: ",24h
@@ -21,6 +25,8 @@ org 100h
     msgDivCociente db "El cociente de la division es: ",24h
     msgDivResto db "El resto de la division es: ",24h
     msgDivError db "No se puede dividir por cero",24h
+    msgPotencia1 db " elevado a la ",24h
+    msgPotencia2 db " es: ",24h
     msgPause db "Presione una tecla para continuar...",24h
     CRLF db 0dh,0ah,24h
 .code
@@ -30,22 +36,6 @@ looop:
     call newline
 
     call pause
-
-    call cls
-
-    mov dx,offset msgInput
-    call printstr
-
-    call readnum
-    mov num1,al
-    
-    call newline
-
-    mov dx,offset msgInput
-    call printstr
-
-    call readnum
-    mov num2,al
 
     call cls
 
@@ -63,11 +53,14 @@ looop:
     je producto
     cmp opcion,4
     je division
+    cmp opcion,5
+    je potencia
     jmp fin
 
 fin:ret
 
 suma:
+    call input2
     mov al,num1
     add al,num2
     mov resultado,al
@@ -75,12 +68,13 @@ suma:
     mov dx,offset msgSuma
     call printstr
     cmp resultado,10
-    jge bigresult
+    jge result2
     mov dl,resultado
     call printnum
     jmp looop
 
 resta:
+    call input2
     mov al,num1
     sub al,num2
     mov resultado,al
@@ -94,18 +88,20 @@ resta:
     jmp looop
 
 producto:
+    call input2
     mov al,num1
     mul num2
     mov resultado,al
     mov dx,offset msgProducto
     call printstr
     cmp resultado,10
-    jge bigresult
+    jge result2
     mov dl,resultado
     call printnum
     jmp looop
 
 division:
+    call input2
     mov ax,0
     mov al,num1
     mov bl,num2
@@ -131,10 +127,39 @@ diverror:
     call printstr
     jmp looop
 
-bigresult:
+potencia:
+    call input2
+    mov cl,num2
+    mov ax,1
+pot:mul num1
+    loop pot
+    mov resultado,al
+    mov dl,num1
+    call printnum
+    mov dx,offset msgPotencia1
+    call printstr
+    mov dl,num2
+    call printnum
+    mov dx,offset msgPotencia2
+    call printstr
+    cmp resultado,10
+    jge result2
+    mov dl,resultado
+    call printnum
+    jmp looop
+
+result2:
+    cmp resultado,100
+    jge result3
     mov ax,0
     mov al,resultado
-    call printbignum
+    call print2digit
+    jmp looop
+
+result3:
+    mov ax,0
+    mov al,resultado
+    call print3digit
     jmp looop
 
 negnumber:
@@ -187,6 +212,9 @@ negnumber:
         mov dx,offset msgOpDiv
         call printstr
         call newline
+        mov dx,offset msgOpPot
+        call printstr
+        call newline
         mov dx,offset msgOpExit
         call printstr
         call newline
@@ -197,19 +225,69 @@ negnumber:
         ret
     endp
     
-    proc splitnum
+    proc input1
+        mov dx,offset msgInput
+        call printstr
+
+        call readnum
+        mov num1,al
+
+        call cls
+    endp
+    
+    proc input2
+        mov dx,offset msgInput
+        call printstr
+
+        call readnum
+        mov num1,al
+        
+        call newline
+
+        mov dx,offset msgInput
+        call printstr
+
+        call readnum
+        mov num2,al
+
+        call cls
+    endp
+
+    proc split2digit
         mov bl,10
         div bl
-        mov resto,ah
-        mov cociente,al
+        mov unidades,ah
+        mov decenas,al
+        ret
+    endp
+
+    proc split3digit
+        mov bl,100
+        div bl
+        mov centenas,ah
+        mov bl,10
+        div bl
+        mov decenas,ah
+        mov unidades,al
         ret
     endp
     
-    proc printbignum
-        call splitnum
-        mov dl,cociente
+    proc print2digit
+        call split2digit
+        mov dl,decenas
         call printnum
-        mov dl,resto
+        mov dl,unidades
+        call printnum
+        ret
+    endp
+
+    proc print3digit
+        call split3digit
+        mov dl,centenas
+        call printnum
+        mov dl,decenas
+        call printnum
+        mov dl,unidades
         call printnum
         ret
     endp
