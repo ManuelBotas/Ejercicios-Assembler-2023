@@ -4,8 +4,8 @@ org 100h
     num1 db ?
     num2 db ?
     resultado db ?
-    unidades db ?
-    decenas db ?
+    resto db ?
+    cociente db ?
     opcion db ?
     msgInput db "Ingrese un numero: ",24h
     msgMenu db "Calculadora: ",24h
@@ -18,7 +18,8 @@ org 100h
     msgSuma db "La suma de los numeros ingresados es: ",24h
     msgResta db "La resta de los numeros ingresados es: ",24h
     msgProducto db "El producto de los numeros ingresados es: ",24h
-    msgDivision db "La division de los numeros ingresados es: ",24h
+    msgDivCociente db "El cociente de la division es: ",24h
+    msgDivResto db "El resto de la division es: ",24h
     msgDivError db "No se puede dividir por cero",24h
     msgPause db "Presione una tecla para continuar...",24h
     CRLF db 0dh,0ah,24h
@@ -105,18 +106,30 @@ producto:
     jmp looop
 
 division:
+    mov ax,0
     mov al,num1
     mov bl,num2
-    ;cmp bl,0
-    ;je diverror
+    cmp bl,0
+    je diverror
     div bl
-    mov resultado,al
-    mov dx,offset msgDivision
+    mov cociente,al
+    mov resto,ah
+    mov dx,offset msgDivCociente
     call printstr
-    ;WIP
+    mov dl,cociente
+    call printnum
+    call newline
+    mov dx,offset msgDivResto
+    call printstr
+    mov dl,resto
+    call printnum
+    jmp looop
 
 diverror:
-    ;WIP
+    call newline
+    mov dx,offset msgDivError
+    call printstr
+    jmp looop
 
 bigresult:
     mov ax,0
@@ -187,16 +200,16 @@ negnumber:
     proc splitnum
         mov bl,10
         div bl
-        mov unidades,ah
-        mov decenas,al
+        mov resto,ah
+        mov cociente,al
         ret
     endp
     
     proc printbignum
         call splitnum
-        mov dl,decenas
+        mov dl,cociente
         call printnum
-        mov dl,unidades
+        mov dl,resto
         call printnum
         ret
     endp
