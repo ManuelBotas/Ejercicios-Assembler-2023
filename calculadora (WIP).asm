@@ -73,7 +73,6 @@ suma:
     call newline
     mov dx,offset msgSuma
     call printstr
-    mov ax,resultado
     cmp resultado,10
     jge bigresult
     mov dl,resultado
@@ -111,6 +110,7 @@ diverror:
     ;WIP
 
 bigresult:
+    mov ax,resultado
     call printbignum
     jmp looop
 
